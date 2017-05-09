@@ -140,7 +140,7 @@ class YangLexer(RegexLexer):
 			include('type_stmts'),
 			include('list_stmts'),
 			(r'/\*', Comment.Multiline, 'comment_stmts'),
-			(r'//.*?$', Comment.Singleline),
+			(r'//.*?$', Comment.Single),
 			include('whitespace_stmts'),
 		]
 	}
