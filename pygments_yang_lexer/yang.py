@@ -7,9 +7,11 @@
     https://tools.ietf.org/html/rfc6020
 """
 
+import re
+
 from pygments.lexer import include, bygroups, RegexLexer
 from pygments.token import *
-import re
+
 
 __all__ = ['YangLexer']
 
@@ -27,6 +29,8 @@ class YangLexer(RegexLexer):
 	aliases = ['yang', 'Yang']
 	filenames = ['*.yang']
 	mimetypes = ['application/yang']
+
+	flags = re.MULTILINE | re.DOTALL
 
 	# Loose interpretations of ABNF in RFC 6020
 	# Single or double multi-line, or unquoted single-line string terminated
@@ -120,12 +124,6 @@ class YangLexer(RegexLexer):
 			(r'(unique)' + _str, bygroups(Token.Keyword, String, Token.Punctuation)),
 			(r'(mandatory)' + _str, bygroups(Token.Keyword, String, Token.Punctuation)),
 		],
-		'comment_stmts': [
-			(r'[^*/]', Comment.Multiline),
-			(r'/\*', Comment.Multiline, '#push'),
-			(r'\*/', Comment.Multiline, '#pop'),
-			(r'[*/]', Comment.Multiline),
-		],
 
 		'root': [
 			(r'{', Token.Punctuation),
@@ -139,8 +137,8 @@ class YangLexer(RegexLexer):
 			include('body_stmts'),
 			include('type_stmts'),
 			include('list_stmts'),
-			(r'/\*', Comment.Multiline, 'comment_stmts'),
-			(r'//.*?$', Comment.Single),
+			(r'/[*](.|\n)*?[*]/', Comment.Multiline),
+			(r'//.*?\n', Comment.Single),
 			include('whitespace_stmts'),
 		]
 	}
