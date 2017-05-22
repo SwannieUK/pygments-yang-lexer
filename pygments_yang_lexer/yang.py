@@ -38,7 +38,7 @@ class YangLexer(RegexLexer):
 	_str = r'(\s+(?s)["\'].+?["\']|\s+[A-Za-z0-9\_\-\.\:\/\[\]]+)(;)'
 	_date = r'(["\']?[0-9]{4}\-[0-9]{2}\-[0-9]{2}["\']?)'
 	# Roughly equivalent to identifier-arg-str
-	_id = r'(["\']?[A-Za-z_][A-Za-z0-9\_\-\.\:]+["\']?)'
+	_id = r'(["\']?[A-Za-z_][A-Za-z0-9\_\-\.\:]*["\']?)'
 	_nodeid = r'(["\']?[A-Za-z_][A-Za-z0-9\_\-\.\:\/]+["\']?)'
 	_instanceid = r'(["\']?\/[A-Za-z_][A-Za-z0-9\_\-\.\:\/]+["\']?)'
 
@@ -124,6 +124,11 @@ class YangLexer(RegexLexer):
 			(r'(unique)' + _str, bygroups(Token.Keyword, String, Token.Punctuation)),
 			(r'(mandatory)' + _str, bygroups(Token.Keyword, String, Token.Punctuation)),
 		],
+		'unknown_statement': [
+			(r'([A-Za-z0-9]+:[A-Za-z0-9\_\-\.]+);', Name.Tag),
+			(r'([A-Za-z0-9]+:[A-Za-z0-9\_\-\.]+)' + _str, bygroups(Name.Tag, String.Doc, Token.Punctuation)),
+			(r'([A-Za-z0-9]+:[A-Za-z0-9\_\-\.]+)\s+' + _id, bygroups(Name.Tag, String)),
+		],
 
 		'root': [
 			(r'{', Token.Punctuation),
@@ -139,6 +144,7 @@ class YangLexer(RegexLexer):
 			include('list_stmts'),
 			(r'/[*](.|\n)*?[*]/', Comment.Multiline),
 			(r'//.*?\n', Comment.Single),
+			include('unknown_statement'),
 			include('whitespace_stmts'),
 		]
 	}
